@@ -28,7 +28,7 @@ async function submitForm(){
   await $fetch('http://127.0.0.1:8000/api/v1/token/login/', {
     method: 'POST',
     body: {
-      username: email.value,
+      email: email.value,
       password: password.value,
       first_name : first_name.value, // addition
       last_name : last_name.value,

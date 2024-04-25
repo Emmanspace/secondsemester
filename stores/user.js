@@ -1,29 +1,35 @@
 import {createPinia, defineStore } from 'pinia'
-import {createPersistedState} from 'pinia-plugin-persistedstate'
+// import {fetchWrapper} from '@/helpers'
+
 
 export const useUserStore = defineStore({
     id: 'user',
     state: () => ({
-        user: {
-            isAuthenticated: false,
-            email: null,
-            token: null,
-            first_name: null, //added
-            last_name: null, //added
-        }
+        users: {},
+        user: {}
     }),
 
     actions: {
+      
         initStore() {
             this.user.isAuthenticated = false
             
-            const storedId = localStorage.getItem('user.id') 
             const storedToken = localStorage.getItem('user.token')
             const storedEmail = localStorage.getItem('user.email')
+            // added
+            // const storedFirstName = localStorage.getItem('user.first_name')
+            // const storedLastName = localStorage.getItem('user.last_name')
+            // const storedPlate = localStorage.getItem('user.plate')
+            // // end of added
 
             if (localStorage.getItem('user.token')) {
                 this.user.token = localStorage.getItem('user.token')
                 this.user.email = localStorage.getItem('user.email')
+                // // added
+                // this.user.first_name = localStorage.getItem('user.first_name')
+                // this.user.last_name = localStorage.getItem('user.last_name')
+                // this.user.plate = localStorage.getItem('user.plate')
+                // // end of added
                 this.user.isAuthenticated = true
 
                 console.log('Initalized user:', this.user)
@@ -34,6 +40,7 @@ export const useUserStore = defineStore({
                     // id : storedId,
                     token: storedToken,
                     email: storedEmail,
+                 
                     isAuthenticated : true,
                 })
                }
@@ -43,12 +50,22 @@ export const useUserStore = defineStore({
 
             this.user.token = token
             this.user.email = email
+
+            // // added
+            // this.user.first_name = first_name
+            // this.user.last_name = last_name
+            // this.user.plate = plate
+            // end of added
             this.user.isAuthenticated = true
             // Cookies.set('token', token, { expires: 7 }); // Set expiry to 7 days
 
 
             localStorage.setItem('user.token', token)
             localStorage.setItem('user.email', email)
+            // added
+            // localStorage.setItem('user.first_name', first_name)
+            // localStorage.setItem('user.last_name', last_name)
+            // localStorage.setItem('user.plate', plate)
         },
         removeToken() {
             console.log('removeToken')
@@ -69,7 +86,7 @@ export const useUserStore = defineStore({
             }
         }
     },
-    plugins: [createPersistedState()],
+    // plugins: [createPersistedState()],
 
 })
 
