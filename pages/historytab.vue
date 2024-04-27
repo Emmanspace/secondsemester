@@ -4,19 +4,27 @@ import {ref, onMounted} from 'vue'
 import axios from 'axios'
 
 const documents = ref([])
+const licensePlate = ref('')
 
 const { data: hist } = await useFetch('http://127.0.0.1:8000/history')
 
-onMounted(async()=> {
-    try{
-        const response = await axios.get('http://127.0.0.1:8000/documents')
-        documents.value = response.data
+onMounted(async () => {
+    let userEmail = localStorage.getItem('email');
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/documents', {
+            params: {
+                email: userEmail
+            }
+        });
+        documents.value = response.data;
+
+        if (response.data.length > 0) {
+            licensePlate.value = response.data[0].plate;
+        }
+    } catch (error) {
+        console.error('Error fetching plate logs', error);
     }
-    catch(error)
-    {
-        console.error('Error fetching plate logs', error)
-    }
-})
+});
 
 
 useSeoMeta({
@@ -35,7 +43,7 @@ useSeoMeta({
                 </h1> 
                 <p> | </p>
                 <h2 >
-                    License Plate: ABC 1234
+                    License Plate: {{ licensePlate }}
                 </h2>
             </div>
             <!-- <div class="absolute">

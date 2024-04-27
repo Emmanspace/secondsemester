@@ -72,12 +72,16 @@ export const useUserStore = defineStore({
 
             this.user.token = null
             this.user.email = null
+            this.token = null
+            this.email = null
             this.user.isAuthenticated = false
             // Cookies.remove('token')
 
 
-            localStorage.setItem('user.token', '')
-            localStorage.setItem('user.email', '')
+            localStorage.removeItem('user.token')
+            localStorage.removeItem('user.email')
+            localStorage.removeItem('email')
+            localStorage.removeItem('token')
         },
         setUser(userData){
             this.user = {

@@ -2,37 +2,70 @@
 import {ref, onMounted, computed} from 'vue'
 import axios from 'axios'
 import {useUserStore} from '@/stores/user'
+const router = useRouter()
 const firstName = ref('')
 const lastName = ref('')
 const email = ref('')
 const errors = ref([])
 
+const user = ref({
+    first_name: '',
+    last_name: '',
+    email: '',
+    plate: ''
+})
+
+async function getProfileData() {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/v1/users/me', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${localStorage.getItem('token')}`
+            }
+        })
+        const userData = await response.data
+        user.value = userData
+    } catch (error) {
+        errors.value.push(`Error fetching profile data: ${error.message}`)
+    }
+}
+
 async function UpdateProfile(){
-    const url = 'http://127.0.0.1:8000/api/v1/users/'
+    const url = 'http://127.0.0.1:8000/api/v1/users/me/'
 
     try
     {
+        const data = {
+            first_name: user.value.first_name,
+            last_name: user.value.last_name,
+            email: user.value.email,
+            plate: user.value.plate
+        };
+
         const response = await fetch(url,{
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include authorization token if applicable
+                'Authorization': `Token ${localStorage.getItem('token')}`, // Include authorization token if applicable
             },
             body: JSON.stringify(data),
-        })
+        });
+
         if (!response.ok)
         {
-            throw new Error (`Error updating profile: ${response.statusText}`)
+            throw new Error (`Error updating profile: ${response.statusText}`);
         }
 
-        const userData = await response.json()
-        this.user = userData
+        const userData = await response.json();
+        user.value = userData; // Update the user data after successful update
+        router.push('/usersettings')
     }
     catch(error){
-        console.log(errors.value)
-
+        errors.value.push(`Error updating profile: ${error.message}`);
     }
 }
+
+onMounted(getProfileData)
 </script>
 <template>
     <div>
@@ -74,27 +107,20 @@ async function UpdateProfile(){
                                     <ul class="space-y-8 mt-3 columns-1 space-x-1 pr-3">
                                         <li class="pr-8">
                                             <p class="font-semibold">First Name</p>
-                                            <input v-model="user.firstName" type="text" placeholder="Juan" class="px-2 py-1 text-sm rounded-md">
+                                            <input v-model="user.first_name" type="text" placeholder="First Name" class="px-2 py-1 text-sm rounded-md">
                                         </li>
                                         <li>
                                             <p class="font-semibold">Last Name</p>
-                                            <input v-model="user.lastName" type="text" placeholder="Dela Cruz" class="px-2 py-1 text-sm rounded-md">
+                                            <input v-model="user.last_name" type="text" placeholder="Last Name" class="px-2 py-1 text-sm rounded-md">
                                         </li>
-                                        <!-- <li>
-                                            <p class="font-semibold">Mobile Number</p>
-                                            <input v-model="mobileNumber" type="tel" placeholder="09167356037" class="px-2 py-1 text-sm rounded-md">
-                                        </li> -->
                                         <li>
                                             <p class="font-semibold">Email Address</p>
-                                            <input v-model="user.email" type="email" placeholder="ue.cal@gmail.com" class="px-2 py-1 text-sm rounded-md" autocomplete="username">
+                                            <input v-model="user.email" type="email" placeholder="Email Address" class="px-2 py-1 text-sm rounded-md">
                                         </li>
-                                        <!-- <li>
-                                            <p class="font-semibold">Password</p>
-                                            <input v-model="password" type="password" placeholder="*********" class="px-2 py-1 text-sm rounded-md" autocomplete="current-password">
-                                            <div class="flex mt-2 ml-14">
-                                                <button type="button" class="border rounded-sm px-2 py-1 text-sm bg-neutral-200">Reset password</button>
-                                            </div>
-                                        </li> -->
+                                        <li>
+                                            <p class="font-semibold">Plate Number</p>
+                                            <input v-model="user.plate" type="text" placeholder="Plate Number" class="px-2 py-1 text-sm rounded-md">
+                                        </li>
                                     </ul>
                                     <!-- end of personal information list -->
                 
